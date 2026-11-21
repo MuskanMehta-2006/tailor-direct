@@ -1,0 +1,48 @@
+
+.suit-viewer {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  background: #e8e3d9;
+  border-radius: 0;
+}
+
+.suit-viewer canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none;
+  outline: none;
+}
+
+.viewer-label {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #555;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.suit-viewer::before,
+.suit-viewer::after {
+  display: none !important;
+  content: none !important;
+}
+
+@media (max-width: 768px) {
+  .suit-viewer {
+    height: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .suit-viewer {
+    height: 100%;
+  }
+}
