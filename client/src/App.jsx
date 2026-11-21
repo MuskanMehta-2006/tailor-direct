@@ -21,6 +21,10 @@ const company = {
   website: "Tailor Direct",
 };
 
+const CHEST_MIN = 34;
+const CHEST_MAX = 54;
+const CHEST_ERROR = "Please enter chest size between 34 and 54 inches.";
+
 const fitLabel = (id) => (id === "SLIM" ? "Slim fit" : "Classic fit");
 
 function App() {
@@ -28,6 +32,7 @@ function App() {
   const [jacketStyle, setJacketStyle] = useState("CLASSIC");
   const [monogram, setMonogram] = useState("");
   const [chest, setChest] = useState("40");
+  const [chestError, setChestError] = useState("");
   const [loading, setLoading] = useState(false);
   const [orderMessage, setOrderMessage] = useState("");
   const [orderSuccess, setOrderSuccess] = useState(false);
@@ -142,9 +147,32 @@ function App() {
     clearConfirmation();
   };
 
+  // Live validation: only digits, max 2 digits, instant error outside 34-54
   const changeChest = (next) => {
+    // Block letters, e, +, -, . etc.
+    if (!/^\d*$/.test(next)) return;
+
+    // No valid chest value has more than 2 digits
+    if (next.length > 2) {
+      setChestError(CHEST_ERROR);
+      return;
+    }
+
     if (next === chest) return;
     setChest(next);
+
+    if (next === "") {
+      setChestError("");
+    } else {
+      const value = Number(next);
+      if (next.length === 1) {
+        // Only 3, 4, 5 can lead to a valid 2-digit value (34-54)
+        setChestError(value >= 3 && value <= 5 ? "" : CHEST_ERROR);
+      } else {
+        setChestError(value < CHEST_MIN || value > CHEST_MAX ? CHEST_ERROR : "");
+      }
+    }
+
     newKey();
     clearConfirmation();
   };
@@ -154,8 +182,9 @@ function App() {
     if (loading) return;
 
     const chestValue = Number(chest);
-    if (!Number.isInteger(chestValue) || chestValue < 34 || chestValue > 54) {
-      setOrderMessage("Please enter a chest measurement between 34 and 54 inches.");
+    if (!Number.isInteger(chestValue) || chestValue < CHEST_MIN || chestValue > CHEST_MAX) {
+      setChestError(CHEST_ERROR);
+      setOrderMessage(CHEST_ERROR);
       setOrderSuccess(false);
       return;
     }
@@ -165,6 +194,7 @@ function App() {
       return;
     }
 
+    setChestError("");
     setOrderMessage("");
     setConfirmOpen(true);
   };
@@ -187,8 +217,9 @@ function App() {
     if (loading) return;
 
     const chestValue = Number(chest);
-    if (!Number.isInteger(chestValue) || chestValue < 34 || chestValue > 54) {
-      setOrderMessage("Please enter a chest measurement between 34 and 54 inches.");
+    if (!Number.isInteger(chestValue) || chestValue < CHEST_MIN || chestValue > CHEST_MAX) {
+      setChestError(CHEST_ERROR);
+      setOrderMessage(CHEST_ERROR);
       setOrderSuccess(false);
       return;
     }
@@ -334,7 +365,6 @@ function App() {
                   <em />
                   Scroll to zoom
                 </span>
-                
               </div>
 
               <div className="viewer-watermark" aria-hidden="true">TD</div>
@@ -474,16 +504,31 @@ function App() {
                   <div className="input-wrap">
                     <input
                       id="chest"
-                      type="number"
-                      min="34"
-                      max="54"
-                      step="1"
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={2}
                       value={chest}
+                      aria-invalid={!!chestError}
+                      aria-describedby="chest-hint"
                       onChange={(e) => changeChest(e.target.value)}
+                      onBlur={() => {
+                        const v = Number(chest);
+                        if (chest === "" || v < CHEST_MIN || v > CHEST_MAX) {
+                          setChestError(CHEST_ERROR);
+                        }
+                      }}
                     />
                     <span>in</span>
                   </div>
-                  <p className="field-hint">Enter a measurement from 34 to 54 inches.</p>
+                  <p
+                    id="chest-hint"
+                    className="field-hint"
+                    style={chestError ? { color: "#c0392b", fontWeight: 500 } : undefined}
+                    role={chestError ? "alert" : undefined}
+                  >
+                    {chestError || "Enter a measurement from 34 to 54 inches."}
+                  </p>
                 </div>
               </div>
             </section>
