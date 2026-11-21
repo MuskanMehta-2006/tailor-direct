@@ -234,7 +234,7 @@ function App() {
 
     try {
       const key = idempotencyKeyRef.current;
-      const response = await fetch("http://localhost:5000/api/orders", {
+      const response = await fetch("https://YOUR-RENDER-URL.onrender.com/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Idempotency-Key": key },
         body: JSON.stringify({
